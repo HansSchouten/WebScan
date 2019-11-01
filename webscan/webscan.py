@@ -16,7 +16,6 @@ class WebScan:
 			Laravel()
 		]
 
-		self.logFile = open('data/results.txt','a')
 		self.domains = pd.read_csv('data/domains.csv').iloc[::-1]
 
 	def start(self):
@@ -54,19 +53,27 @@ class WebScan:
 
 		"""
 		message = "Match found on " + url
-		self.logFile.write(str(datetime.now()) + "\n")
-		self.logFile.write(message + "\n\n")
+		self.log("\n" + str(datetime.now()) + "\n" + message + "\n\n")
 
 	def performRequest(self, url):
 		"""
 		Perform an HTTP GET request to the given URL and return the response.
 
 		"""
+		self.log("Requesting: " + url + "\n")
 		try:
-			#print("Requesting " + url)
 			return requests.get(url=url, timeout=3)
 		except:
 			return None
+		
+	def log(self, message):
+		"""
+		Log the given message.
+
+		"""
+		logFile = open('data/results.txt','a')
+		logFile.write(message)
+		logFile.close()
 
 	def printProgressBar(self, iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
 		"""
