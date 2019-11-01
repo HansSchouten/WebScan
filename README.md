@@ -14,4 +14,7 @@ index,domain
 1,test2.com
 ```
 
+Extend `webscan/scanners.py` with additional scanners for each configuration you would like to check.
+Add your scanners to `webscan/webscan.py`.
+
 Next, run `py webscan.py`.
