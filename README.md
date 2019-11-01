@@ -3,7 +3,7 @@ Scan for website misconfigurations
 
 ## Installation
 
-Dependencies can be installed by running `setup.sh`.
+Dependencies can be installed by running `py setup.py`.
 
 ## Usage
 
@@ -14,4 +14,4 @@ index,domain
 1,test2.com
 ```
 
-Next, run `python webscan.py`.
+Next, run `py webscan.py`.
