@@ -41,4 +41,4 @@ class Laravel(Scanner):
 		Return whether the scan was successful based on the given response
 
 		"""
-		return "APP_ENV=" in response.html()
+		return "APP_ENV=" in response

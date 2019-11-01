@@ -1,2 +1,2 @@
 py -m pip install pandas
-py -m pip install pyquery
+py -m pip install requests

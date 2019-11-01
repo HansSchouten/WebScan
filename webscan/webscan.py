@@ -1,6 +1,7 @@
 import pandas as pd
+import requests
 from datetime import datetime
-from pyquery import PyQuery as pq
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from webscan.scanners import *
 
@@ -16,19 +17,20 @@ class WebScan:
 		]
 
 		self.logFile = open('data/results.txt','a')
-		self.domains = pd.read_csv('data/domains.csv')
+		self.domains = pd.read_csv('data/domains.csv').iloc[::-1]
 
 	def start(self):
 		"""
 		Start scanning the configured list of domains.
 
 		"""
-		l = self.domains.shape[0]
-		self.printProgressBar(0, l, prefix = 'Progress:', suffix = 'Complete', length = 50)
-
-		for index, row in self.domains.iterrows():
-			self.scan(row.domain)
-			self.printProgressBar(index + 1, l, prefix = 'Progress:', suffix = 'Complete', length = 50)
+		self.total = self.domains.shape[0]
+		self.index = 0
+		
+		processes = []
+		with ThreadPoolExecutor(max_workers=5) as executor:
+			for index, row in self.domains.iterrows():
+				processes.append(executor.submit(self.scan, row.domain))
 
 	def scan(self, domain):
 		"""
@@ -39,8 +41,12 @@ class WebScan:
 			path = scanner.getPath()
 			url = "https://" + domain + "/" + path
 			response = self.performRequest(url)
-			if (response and scanner.hasMatch(response)):
-				self.processMatch(url, response.html())
+			if (response and scanner.hasMatch(response.text)):
+				self.processMatch(url, response.text)
+
+		# print progress
+		self.index = self.index + 1
+		self.printProgressBar(self.index, self.total, prefix = 'Progress:', suffix = 'Complete', length = 50)
 
 	def processMatch(self, url, data):
 		"""
@@ -57,7 +63,8 @@ class WebScan:
 
 		"""
 		try:
-			return pq(url=url)
+			#print("Requesting " + url)
+			return requests.get(url=url, timeout=3)
 		except:
 			return None
 
@@ -73,6 +80,7 @@ class WebScan:
 			length      - Optional  : character length of bar (Int)
 			fill        - Optional  : bar fill character (Str)
 			printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
+
 		"""
 		percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
 		filledLength = int(length * iteration // total)
