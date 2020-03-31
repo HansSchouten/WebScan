@@ -16,7 +16,7 @@ class WebScan:
 			Laravel()
 		]
 
-		self.domains = pd.read_csv('data/domains.csv').iloc[::-1]
+		self.domains = pd.read_csv('data/top-1m.csv').iloc[::-1]
 
 	def start(self):
 		"""
@@ -25,9 +25,10 @@ class WebScan:
 		"""
 		self.total = self.domains.shape[0]
 		self.index = 0
+
 		
 		processes = []
-		with ThreadPoolExecutor(max_workers=5) as executor:
+		with ThreadPoolExecutor(max_workers=10) as executor:
 			for index, row in self.domains.iterrows():
 				processes.append(executor.submit(self.scan, row.domain))
 
@@ -62,7 +63,7 @@ class WebScan:
 		"""
 		self.log("Requesting: " + url + "\n")
 		try:
-			return requests.get(url=url, timeout=3)
+			return requests.get(url=url, timeout=2)
 		except:
 			return None
 		
